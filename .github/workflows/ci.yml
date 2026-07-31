@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - run: deno task check
+      - run: deno task test
+
+      # commit された生成物が .peggy と乖離していないことを保証する。
+      # JSR は publish 時にビルドを走らせないので、生成物の正しさは CI で担保するしかない。
+      - name: 生成物が chordpro.peggy と一致する
+        run: |
+          deno task build
+          git diff --exit-code src/grammar
