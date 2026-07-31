@@ -1,10 +1,13 @@
 name: Publish
 
-# タグを push すると JSR に publish する。
+# JSR に publish する。
 # OIDC で認証するのでトークンの管理は不要（id-token: write が必須）。
+#
+# jsr.io に @chordwiki scope がまだ無いため、いまは手動実行のみ。
+# scope とパッケージを作って GitHub リポジトリを紐付けたら、
+# `on: push: tags: ["v*"]` に戻して Release と同時に publish する。
 on:
-  push:
-    tags: ["v*"]
+  workflow_dispatch:
 
 jobs:
   publish:

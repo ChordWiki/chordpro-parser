@@ -1,0 +1,43 @@
+name: Release
+
+# タグを push すると npm 形式の tarball を作って GitHub Release に添付する。
+# public リポジトリなので、利用側は認証なしで URL 依存として参照できる:
+#
+#   "@chordwiki/chordpro-parser":
+#     "https://github.com/ChordWiki/chordpro-parser/releases/download/v0.1.0/chordwiki-chordpro-parser-0.1.0.tgz"
+#
+# JSR に publish できるようになったらこのワークフローは不要になる。
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - run: deno task check
+      - run: deno task test
+
+      - name: deno.json の version がタグと一致する
+        run: |
+          v=$(deno eval 'console.log(JSON.parse(Deno.readTextFileSync("deno.json")).version)')
+          if [ "v$v" != "$GITHUB_REF_NAME" ]; then
+            echo "deno.json の version ($v) とタグ ($GITHUB_REF_NAME) が食い違っています"
+            exit 1
+          fi
+
+      - run: deno run -A build_npm.ts
+      - run: npm pack --pack-destination ..
+        working-directory: npm
+
+      - name: Release を作って tarball を添付する
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" ./*.tgz --generate-notes
