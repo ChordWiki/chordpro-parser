@@ -13,7 +13,11 @@ import {
   Note,
   SimpleLine,
 } from "../src/song.ts";
-import type { LyricsWithAnnotation, LyricsWithChord } from "../src/song.ts";
+import type {
+  LyricsWithAnnotation,
+  LyricsWithChord,
+  URLTag,
+} from "../src/song.ts";
 
 Deno.test("タグと歌詞", () => {
   const song = parseSong("{title:練習用}\n{key:C}\n[C]あい[G]うえ");
@@ -101,6 +105,23 @@ Deno.test("URL タグ", () => {
   const line = parseCst("{ChordWiki>https://example.com/x}").lines[0];
   assertEquals(line.items[0].type, "URLTag");
   assertEquals(line.items[0].label, "ChordWiki");
+  assertEquals(line.items[0].url, "https://example.com/x");
+  // 添字キーが混入していたのが url 欠落の原因だった。再発したら気付けるようにする。
+  assertEquals(Object.keys(line.items[0]).sort(), ["label", "type", "url"]);
+});
+
+Deno.test("ラベルなしの URL タグ", () => {
+  const line = parseCst("{https://example.com/x}").lines[0];
+  assertEquals(line.items[0].label, null);
+  assertEquals(line.items[0].url, "https://example.com/x");
+});
+
+Deno.test("URL タグは deserialize 後も url を保つ", () => {
+  const line = parseSong("{ChordWiki>https://example.com/x}")
+    .lines[0] as MarkUpLine;
+  const tag = line.items[0] as URLTag;
+  assertEquals(tag.url, "https://example.com/x");
+  assertEquals(tag.label, "ChordWiki");
 });
 
 Deno.test("未知の行は UnknownLine に落ちる", () => {

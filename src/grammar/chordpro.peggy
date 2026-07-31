@@ -27,7 +27,7 @@ Item
   / a:LyricsWithAnnotation { return { type: "LyricsWithAnnotation", ...a } }
 
 URLTag = _ "{" @URLWithLabel _ "}"
-URLWithLabel = label:(@$([^\n\r{}] !Schema)* ">")? u:URL { return { label, ...u } }
+URLWithLabel = label:(@$([^\n\r{}] !Schema)* ">")? u:URL { return { label, url: u } }
 URL = $(Schema [^\n\r{}]+)
 Schema = "http:" / "https:"
 

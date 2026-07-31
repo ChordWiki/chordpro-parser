@@ -262,7 +262,7 @@ function peg$parse(input, options) {
   function peg$f8(b) {    return { type: "Bars", text: b, annotation: true }  }
   function peg$f9(c) {    return { type: "LyricsWithChord", ...c }  }
   function peg$f10(a) {    return { type: "LyricsWithAnnotation", ...a }  }
-  function peg$f11(label, u) {    return { label, ...u }  }
+  function peg$f11(label, u) {    return { label, url: u }  }
   function peg$f12(name, value) {    return { name: name.toLowerCase(), value }  }
   function peg$f13(c, l) {    return {chord: c, lyrics: l}  }
   function peg$f14(c) {    return {chord: c}  }
