@@ -3,6 +3,7 @@ import {
   Bars,
   BlankLine,
   Chord,
+  CommentLine,
   LyricsWithAnnotation,
   LyricsWithChord,
   MarkUpLine,
@@ -27,6 +28,8 @@ function deserializeLine(serialized: any) {
   switch (serialized.type) {
     case "BlankLine":
       return new BlankLine();
+    case "CommentLine":
+      return new CommentLine(serialized.text);
     case "SimpleLine":
       return new SimpleLine(serialized.text);
     case "MarkUpLine": {

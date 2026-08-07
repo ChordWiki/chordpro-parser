@@ -7,6 +7,7 @@ NewLineOrEOF = NewLine / !.
 
 Line
   = BlankLine &NewLineOrEOF { return { type: "BlankLine" } }
+  / l:CommentLine &NewLineOrEOF { return { type: "CommentLine", text: l } }
   / l:SimpleLine &NewLineOrEOF { return { type: "SimpleLine", text: l } }
   / l:MarkUpLine &NewLineOrEOF { return { type: "MarkUpLine", items: l } }
   / l:UnknownLine &NewLineOrEOF { return { type: "UnknownLine", text: l } }
@@ -14,6 +15,8 @@ Line
 _ "whitespace" = $[ \t]*
 
 BlankLine = _
+// `#` 以降は行末まで丸ごとコメント。`[` や `{` も解釈しない。
+CommentLine = _ "#" @$[^\n\r]*
 SimpleLine = $[^\n\r\[\]{}]+
 MarkUpLine = Item+
 UnknownLine = $[^\n\r]*
@@ -31,8 +34,13 @@ URLWithLabel = label:(@$([^\n\r{}] !Schema)* ">")? u:URL { return { label, url: 
 URL = $(Schema [^\n\r{}]+)
 Schema = "http:" / "https:"
 
-Tag = _ "{" _ name:$[a-z]i+ _ ":" value:$[^\n\r{}]+ "}"
+// タグ名には `comment_italic` の `_` と `mp3` の数字が入る。
+// `{soc}` のような値なしタグは value を空文字にする。`{title:}` は
+// 値ありの形が空なので UnknownLine のままで、両者は取り違えない。
+Tag = _ "{" _ name:$[a-z0-9_]i+ _ ":" value:$[^\n\r{}]+ "}"
       { return { name: name.toLowerCase(), value } }
+    / _ "{" _ name:$[a-z0-9_]i+ _ "}"
+      { return { name: name.toLowerCase(), value: "" } }
 
 Bars = RepeatLeft / RepeatRight / DoubleBar / Bar
 RepeatLeft = "||:"

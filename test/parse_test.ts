@@ -8,6 +8,7 @@ import { parseCst, parseSong } from "../src/parse.ts";
 import {
   Bars,
   BlankLine,
+  CommentLine,
   Key,
   MarkUpLine,
   Note,
@@ -32,11 +33,66 @@ Deno.test("タグと歌詞", () => {
   assertEquals(`${first.chord}`, "C");
 });
 
+Deno.test("タグ名の `_` と数字", () => {
+  const song = parseSong(
+    "{comment_italic:イタリック}\n{mp3:http://example.com/a.mp3}",
+  );
+  assertEquals(song.tags.map((t) => [t.name, t.value]), [
+    ["comment_italic", "イタリック"],
+    ["mp3", "http://example.com/a.mp3"],
+  ]);
+});
+
+Deno.test("値なしタグ", () => {
+  const song = parseSong("{soc}\n{start_of_chorus}\n{eot}\n{ Sot }");
+  assertEquals(song.tags.map((t) => [t.name, t.value]), [
+    ["soc", ""],
+    ["start_of_chorus", ""],
+    ["eot", ""],
+    ["sot", ""],
+  ]);
+});
+
+Deno.test("空値のタグは UnknownLine のまま", () => {
+  assertEquals(parseSong("{title:}").lines[0].constructor.name, "UnknownLine");
+  assertEquals(parseSong("{}").lines[0].constructor.name, "UnknownLine");
+});
+
 Deno.test("行の種類", () => {
   const song = parseSong("ただの歌詞\n\n[C]コード付き");
   assertEquals(song.lines[0] instanceof SimpleLine, true);
   assertEquals(song.lines[1] instanceof BlankLine, true);
   assertEquals(song.lines[2] instanceof MarkUpLine, true);
+});
+
+Deno.test("コメント行", () => {
+  const song = parseSong("#コメント\n  #字下げあり\n#\nあ#行頭でない");
+  const [c0, c1, c2, s] = song.lines;
+  assertEquals((c0 as CommentLine).text, "コメント");
+  assertEquals((c1 as CommentLine).text, "字下げあり");
+  assertEquals((c2 as CommentLine).text, "");
+  // `#` が行頭でなければただの歌詞。
+  assertEquals(s instanceof SimpleLine, true);
+});
+
+Deno.test("コメント行の中身は解釈しない", () => {
+  const song = parseSong("#[C]あ{title:x}|");
+  const line = song.lines[0];
+  assertEquals(line instanceof CommentLine, true);
+  assertEquals((line as CommentLine).text, "[C]あ{title:x}|");
+  assertEquals(song.tags, []);
+});
+
+Deno.test("行頭でない `#` はコメントにならない", () => {
+  // CommentLine は行頭固定。タグの値やコードに `#` が来ても切れない。
+  const song = parseSong("{c:A#からAll in}\n  {comment:C#m7-5}\n{c:A#}#後ろ");
+  assertEquals(song.tags.map((t) => [t.name, t.value]), [
+    ["c", "A#からAll in"],
+    ["comment", "C#m7-5"],
+    ["c", "A#"],
+  ]);
+  const line = song.lines[2] as MarkUpLine;
+  assertEquals((line.items[1] as LyricsWithChord).lyrics, "#後ろ");
 });
 
 Deno.test("小節線と注釈小節線", () => {
