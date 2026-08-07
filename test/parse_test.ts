@@ -42,6 +42,21 @@ Deno.test("タグ名の `_` と数字", () => {
   ]);
 });
 
+Deno.test("値なしタグ", () => {
+  const song = parseSong("{soc}\n{start_of_chorus}\n{eot}\n{ Sot }");
+  assertEquals(song.tags.map((t) => [t.name, t.value]), [
+    ["soc", ""],
+    ["start_of_chorus", ""],
+    ["eot", ""],
+    ["sot", ""],
+  ]);
+});
+
+Deno.test("空値のタグは UnknownLine のまま", () => {
+  assertEquals(parseSong("{title:}").lines[0].constructor.name, "UnknownLine");
+  assertEquals(parseSong("{}").lines[0].constructor.name, "UnknownLine");
+});
+
 Deno.test("行の種類", () => {
   const song = parseSong("ただの歌詞\n\n[C]コード付き");
   assertEquals(song.lines[0] instanceof SimpleLine, true);

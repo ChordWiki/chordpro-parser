@@ -32,8 +32,12 @@ URL = $(Schema [^\n\r{}]+)
 Schema = "http:" / "https:"
 
 // タグ名には `comment_italic` の `_` と `mp3` の数字が入る。
+// `{soc}` のような値なしタグは value を空文字にする。`{title:}` は
+// 値ありの形が空なので UnknownLine のままで、両者は取り違えない。
 Tag = _ "{" _ name:$[a-z0-9_]i+ _ ":" value:$[^\n\r{}]+ "}"
       { return { name: name.toLowerCase(), value } }
+    / _ "{" _ name:$[a-z0-9_]i+ _ "}"
+      { return { name: name.toLowerCase(), value: "" } }
 
 Bars = RepeatLeft / RepeatRight / DoubleBar / Bar
 RepeatLeft = "||:"
