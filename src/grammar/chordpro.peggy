@@ -31,7 +31,8 @@ URLWithLabel = label:(@$([^\n\r{}] !Schema)* ">")? u:URL { return { label, url: 
 URL = $(Schema [^\n\r{}]+)
 Schema = "http:" / "https:"
 
-Tag = _ "{" _ name:$[a-z]i+ _ ":" value:$[^\n\r{}]+ "}"
+// タグ名には `comment_italic` の `_` と `mp3` の数字が入る。
+Tag = _ "{" _ name:$[a-z0-9_]i+ _ ":" value:$[^\n\r{}]+ "}"
       { return { name: name.toLowerCase(), value } }
 
 Bars = RepeatLeft / RepeatRight / DoubleBar / Bar

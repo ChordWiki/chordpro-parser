@@ -199,7 +199,7 @@ function peg$parse(input, options) {
   const peg$r2 = /^[^\n\r[\]{}]/;
   const peg$r3 = /^[^\n\r]/;
   const peg$r4 = /^[^\n\r{}]/;
-  const peg$r5 = /^[a-z]/i;
+  const peg$r5 = /^[a-z0-9_]/i;
   const peg$r6 = /^[^\n\r[\]{}|:]/;
   const peg$r7 = /^[A-G]/;
   const peg$r8 = /^[#b]/;
@@ -220,7 +220,7 @@ function peg$parse(input, options) {
   const peg$e10 = peg$literalExpectation(">", false);
   const peg$e11 = peg$literalExpectation("http:", false);
   const peg$e12 = peg$literalExpectation("https:", false);
-  const peg$e13 = peg$classExpectation([["a", "z"]], false, true, false);
+  const peg$e13 = peg$classExpectation([["a", "z"], ["0", "9"], "_"], false, true, false);
   const peg$e14 = peg$literalExpectation(":", false);
   const peg$e15 = peg$literalExpectation("||:", false);
   const peg$e16 = peg$literalExpectation(":||", false);

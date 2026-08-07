@@ -32,6 +32,16 @@ Deno.test("タグと歌詞", () => {
   assertEquals(`${first.chord}`, "C");
 });
 
+Deno.test("タグ名の `_` と数字", () => {
+  const song = parseSong(
+    "{comment_italic:イタリック}\n{mp3:http://example.com/a.mp3}",
+  );
+  assertEquals(song.tags.map((t) => [t.name, t.value]), [
+    ["comment_italic", "イタリック"],
+    ["mp3", "http://example.com/a.mp3"],
+  ]);
+});
+
 Deno.test("行の種類", () => {
   const song = parseSong("ただの歌詞\n\n[C]コード付き");
   assertEquals(song.lines[0] instanceof SimpleLine, true);
