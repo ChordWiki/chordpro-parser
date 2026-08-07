@@ -1,1 +1,4 @@
 .DS_Store
+
+# build_npm.ts の出力（ローカル検証用）
+npm/
