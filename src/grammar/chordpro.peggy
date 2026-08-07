@@ -7,6 +7,7 @@ NewLineOrEOF = NewLine / !.
 
 Line
   = BlankLine &NewLineOrEOF { return { type: "BlankLine" } }
+  / l:CommentLine &NewLineOrEOF { return { type: "CommentLine", text: l } }
   / l:SimpleLine &NewLineOrEOF { return { type: "SimpleLine", text: l } }
   / l:MarkUpLine &NewLineOrEOF { return { type: "MarkUpLine", items: l } }
   / l:UnknownLine &NewLineOrEOF { return { type: "UnknownLine", text: l } }
@@ -14,6 +15,8 @@ Line
 _ "whitespace" = $[ \t]*
 
 BlankLine = _
+// `#` 以降は行末まで丸ごとコメント。`[` や `{` も解釈しない。
+CommentLine = _ "#" @$[^\n\r]*
 SimpleLine = $[^\n\r\[\]{}]+
 MarkUpLine = Item+
 UnknownLine = $[^\n\r]*

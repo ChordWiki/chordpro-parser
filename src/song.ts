@@ -63,9 +63,22 @@ export function songMeta(song: Song): { title: string; subtitle: string } {
   return { title, subtitle };
 }
 
-export type Line = BlankLine | SimpleLine | MarkUpLine | UnknownLine;
+export type Line =
+  | BlankLine
+  | CommentLine
+  | SimpleLine
+  | MarkUpLine
+  | UnknownLine;
 
 export class BlankLine {}
+
+/** `#` で始まる行。表示されないコメント。`text` は `#` より後ろ。 */
+export class CommentLine {
+  text: string;
+  constructor(text: string) {
+    this.text = text;
+  }
+}
 
 export class SimpleLine {
   text: string;
