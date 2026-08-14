@@ -166,7 +166,7 @@ type Degree = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 const baseNoteInvert = invert(baseNoteInST);
 const noteFromST = {
-  "": { 1: "Bb", 4: "C#", 6: "Eb", 9: "F#", 11: "Ab", ...baseNoteInvert },
+  "": { 1: "Bb", 4: "Db", 6: "Eb", 9: "F#", 11: "Ab", ...baseNoteInvert },
   "b": { 1: "Bb", 4: "Db", 6: "Eb", 9: "Gb", 11: "Ab", ...baseNoteInvert },
   "#": { 1: "A#", 4: "C#", 6: "D#", 9: "F#", 11: "G#", ...baseNoteInvert },
 };
