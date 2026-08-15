@@ -106,6 +106,22 @@ Deno.test("小節線と注釈小節線", () => {
   ]);
 });
 
+Deno.test("全角の小節線は半角に正規化する", () => {
+  const line = parseSong("｜[C]あ｜｜：[G]い：||[｜]").lines[0] as MarkUpLine;
+  const bars = line.items.filter((i) => i instanceof Bars);
+  assertEquals(bars.map((b) => [b.text, b.annotation]), [
+    ["|", false],
+    ["||:", false],
+    [":||", false],
+    ["|", true],
+  ]);
+});
+
+Deno.test("小節線でない全角コロンは歌詞に残る", () => {
+  const line = parseSong("[C]あ：い").lines[0] as MarkUpLine;
+  assertEquals((line.items[0] as LyricsWithChord).lyrics, "あ：い");
+});
+
 Deno.test("注釈", () => {
   const line = parseSong("[Intro]あい").lines[0] as MarkUpLine;
   const item = line.items[0] as LyricsWithAnnotation;

@@ -42,15 +42,20 @@ Tag = _ "{" _ name:$[a-z0-9_]i+ _ ":" value:$[^\n\r{}]+ "}"
     / _ "{" _ name:$[a-z0-9_]i+ _ "}"
       { return { name: name.toLowerCase(), value: "" } }
 
+// 全角の `：` `｜` も小節線として受け付け、半角に正規化して返す。
 Bars = RepeatLeft / RepeatRight / DoubleBar / Bar
-RepeatLeft = "||:"
-RepeatRight = ":||"
-DoubleBar = "||"
-Bar = "|"
+RepeatLeft = VerticalBar VerticalBar Colon { return "||:" }
+RepeatRight = Colon VerticalBar VerticalBar { return ":||" }
+DoubleBar = VerticalBar VerticalBar { return "||" }
+Bar = VerticalBar { return "|" }
+
+Colon "colon" = ":" / "："
+VerticalBar "vertical bar" = "|" / "｜"
 
 AnnotationBars = "[" @Bars "]"
 
-LyricChar = [^\n\r\[\]{}|:] / ":" !"||"
+// コロンは `:||` の一部でなければ歌詞として残す。歌詞側は原文のまま。
+LyricChar = [^\n\r\[\]{}|｜:：] / Colon !(VerticalBar VerticalBar)
 
 LyricsWithChord
   = "[" c:Chord "]" l:$LyricChar+ { return {chord: c, lyrics: l} }
