@@ -6,7 +6,8 @@
     "npm"
   ],
   "exports": {
-    ".": "./src/mod.ts"
+    ".": "./src/mod.ts",
+    "./song": "./src/song.ts"
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@^1.0.0",

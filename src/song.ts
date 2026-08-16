@@ -1,4 +1,16 @@
 /**
+ * chordpro を読み取った結果のデータ構造と、その上での移調。
+ *
+ * `@chordwiki/chordpro-parser/song` として入口にしてあるのは、**文法を持ち込まずに
+ * ここだけを使う利用者**のため。パーサ本体（peggy 生成の文法）は数十 KB あり、
+ * 入口（`mod.ts`）から読むと `parseSong` 経由でそれも付いてくる。サーバで parse
+ * した結果をブラウザで移調するような使い方では、文法は要らない。
+ *
+ * 入口が増えるので、**`deno.json` の exports と `build_npm.ts` の entryPoints は
+ * 揃えること。** 片方だけだと利用側で公開版とローカルビルドの挙動が食い違う。
+ */
+
+/**
  * オブジェクトのキーと値を入れ替える。`@std/collections` の `invert` 相当。
  */
 function invert<T extends Record<PropertyKey, PropertyKey>>(

@@ -21,7 +21,9 @@ const denoJson = JSON.parse(await Deno.readTextFile("./deno.json"));
 await emptyDir("./npm");
 
 await build({
-  entryPoints: ["./src/mod.ts"],
+  // deno.json の exports と揃える。片方だけに足すと、JSR 版とこのビルドで
+  // 入口の顔ぶれが変わり、利用側が「ローカルでは通るのに公開版で落ちる」になる。
+  entryPoints: ["./src/mod.ts", { name: "./song", path: "./src/song.ts" }],
   outDir: "./npm",
   shims: {},
   test: false,
